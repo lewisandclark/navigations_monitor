@@ -25,7 +25,7 @@ Before you can use LiveWhale Navigations Monitor, you must fill out some basic i
     $ cd ./navigations_monitor
     $ cp application.config.sample.php application.config.php
 
-Then, open the `application.config.php` file in any code/text editor and set (at minimum) the email addresses for the recipients, the sender and any errors.
+Then, open the `application.config.php` file in any code/text editor and set (at minimum) the email addresses for the recipients, the sender (your LiveWhale) and any errors emails (your webmaster perhaps).
 
 ## Usage
 

@@ -262,7 +262,7 @@ class LiveWhaleApplicationNavigationsMonitor {
   function onManagerSubmit ($type, $page) {
     global $_LW;
     if ( $this->is_editing_navigations() ) {
-      $message = $this->message($changed);
+      $message = $this->message();
       if ( $message && !empty($this->recipients) ) @mail(implode(', ', (array) $this->recipients), 'LiveWhale Navigation Update', $message, $this->headers());
       if ( is_resource($this->logfile) ) @fclose($this->logfile);
     }
