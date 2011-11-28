@@ -29,7 +29,7 @@ Then, open the `application.config.php` file in any code/text editor and set (at
 
 ## Usage
 
-Once you have everything installed it should simply begin working. (You might have to wait a few minutes if you have application caching in place.)
+Once you have everything installed and configured it should simply begin working. (You might have to wait a few minutes if you have application caching in place.)
 
 ## Developers
 
