@@ -16,7 +16,7 @@ The easiest way to install this software is to use git to clone it into your liv
 
 Git will then copy the most current version of the code into a navigations_monitor folder within client/modules.
 
-If you don't have or are unable to use git, you can also download a zip or tarball from github (use the downloads button) and extract it manually into the livewhale/client/modules folder as push. (Don't change the name, it will make it non-functional in LiveWhale.)
+If you don't have or are unable to use git, you can also download a zip or tarball from github (use the downloads button) and extract it manually into the livewhale/client/modules folder as `navigations_monitor`. (Don't change the name, it will make it non-functional in LiveWhale.)
 
 ## Configuration
 
