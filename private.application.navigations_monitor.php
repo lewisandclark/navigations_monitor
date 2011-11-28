@@ -213,7 +213,7 @@ class LiveWhaleApplicationNavigationsMonitor {
 
     $summary = array();
     foreach ( $new as $new_item ) $summary[] = $this->summarize_item($new_item, $pushed);
-    foreach ( $old as $old_item ) if ( !empty($old_item['dropped']) ) $summary[] = ''; $summary[] = $this->summarize_item($old_item, $pushed);
+    foreach ( $old as $old_item ) if ( !empty($old_item['dropped']) ) array_push($summary, "", $this->summarize_item($old_item, $pushed));
 
     return implode(('<br />' . $this->linebreak . '<br />' . $this->linebreak), $summary);
   }
