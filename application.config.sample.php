@@ -20,7 +20,7 @@ $config = array(
   'from_email' => 'LiveWhale <livewhale@school.edu>',
 
 /*  The email address for email sending errors, should they occur. */
-  'error_email' => 'Webmaster <wwwadmin@lclark.edu>',
+  'error_email' => 'Webmaster <webmaster@school.edu>',
 
 /*  The indent of the navigation items; the default is: "&nbsp; &nbsp; &nbsp;". */ 
   'indent' => "&nbsp; &nbsp; &nbsp;",
