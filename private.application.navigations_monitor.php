@@ -90,11 +90,11 @@ class LiveWhaleApplicationNavigationsMonitor {
     foreach ( $items as $item ) if ( !empty($item['pgid']) ) $pgids["{$item['pgid']}"] = $item['pgid'];
     if ( empty($pgids) ) return NULL;
     ksort($pgids);
-    $pages = $_LW->query("SELECT `livewhale_pages`.`id`, `livewhale_pages`.`host`, `livewhale_pages`.`path` FROM `livewhale_pages` WHERE `livewhale_pages`.`id` IN (" . implode(',', array_keys($pgids)) . ") ORDER BY `livewhale_pages`.`id`;");
+    $pages = $_LW->query("SELECT `livewhale_pages`.`id`, `livewhale_pages`.`host`, `livewhale_pages`.`path` FROM `livewhale_pages` WHERE `livewhale_pages`.`id` IN (" . implode(', ', array_keys($pgids)) . ") ORDER BY `livewhale_pages`.`id`;");
     if ( $pages && $pages->num_rows ) while ( $page = $pages->fetch_assoc() ) $pgids["{$page['id']}"] = $page;
     foreach ( $items as $index => $item ) {
-      if ( !empty($pgids["{$item['pgid']}"]) && empty($item['url']) ) $items[$index]['url'] = "http://" . $pgids["{$item['pgid']}"]['host'] . $pgids["{$item['pgid']}"]['path'];
-      if ( empty($item['url']) ) $items[$index]['url'] = $this->blank;
+      if ( !empty($pgids["{$item['pgid']}"]) && empty($items[$index]['url']) ) $items[$index]['url'] = "http://" . $pgids["{$item['pgid']}"]['host'] . str_replace('/index.php', '/', $pgids["{$item['pgid']}"]['path']);
+      if ( empty($items[$index]['url']) ) $items[$index]['url'] = $this->blank;
     }
     return NULL;
   }
@@ -143,23 +143,34 @@ class LiveWhaleApplicationNavigationsMonitor {
     return $this->only_has_position_changes($this->changed($old_item, $new_item));
   }
 
+  function change_type ( $changed, &$assigned ) {
+    if ( !is_bool($assigned) ) $assigned = FALSE;
+    if ( $this->has_no_changes($changed) ) {
+      $assigned = TRUE;
+      return 'has_no_changes';
+    } else if ( $this->only_has_display_changes($changed) ) {
+      $assigned = TRUE;
+      return 'only_has_display_changes';
+    } else if ( $this->only_has_link_changes($changed) ) {
+      $assigned = TRUE;
+      return 'only_has_link_changes';
+    } else if ( $this->only_has_position_changes($changed) ) {
+      $assigned = TRUE;
+      return 'only_has_position_changes';
+    }
+    return NULL;
+  }
+
   function assess_changes ( &$old, &$new ) {
     foreach ( $old as $old_index => $old_item ) {
       $assigned = FALSE;
-      foreach ( $new as $new_index => $new_item ) {
-        $changed = $this->changed($old_item, $new_item);
-        if ( $this->has_no_changes($changed) ) {
-          $new[$new_index]['has_no_changes'] = $old_item;
-          $assigned = TRUE;
-        } else if ( $this->only_has_display_changes($changed) ) {
-          $new[$new_index]['only_has_display_changes'] = $old_item;
-          $assigned = TRUE;
-        } else if ( $this->only_has_link_changes($changed) ) {
-          $new[$new_index]['only_has_link_changes'] = $old_item;
-          $assigned = TRUE;
-        } else if ( $this->only_has_position_changes($changed) ) {
-          $new[$new_index]['only_has_position_changes'] = $old_item;
-          $assigned = TRUE;
+      $change_type = $this->change_type($this->changed($old_item, $new[$old_index]), $assigned);
+      if ( $change_type ) {
+        $new[$old_index][$change_type] = $old_item;
+      } else {
+        foreach ( $new as $new_index => $new_item ) {
+          $change_type = $this->change_type($this->changed($old_item, $new_item), $assigned);
+          if ( $change_type ) $new[$new_index][$change_type] = $old_item;
         }
       }
       if ( !$assigned ) $old[$old_index]['dropped'] = TRUE;
@@ -206,6 +217,8 @@ class LiveWhaleApplicationNavigationsMonitor {
 
     if ( empty($old) || !is_array($old) ) $old = $this->prior_navigation_items;
     if ( empty($new) || !is_array($new) ) $new = $this->get_navigation_items();
+
+    $this->logger(var_export($old, TRUE));
 
     $this->assess_changes($old, $new);
     $this->assign_page_urls_for($new);
