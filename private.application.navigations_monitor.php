@@ -218,8 +218,6 @@ class LiveWhaleApplicationNavigationsMonitor {
     if ( empty($old) || !is_array($old) ) $old = $this->prior_navigation_items;
     if ( empty($new) || !is_array($new) ) $new = $this->get_navigation_items();
 
-    $this->logger(var_export($old, TRUE));
-
     $this->assess_changes($old, $new);
     $this->assign_page_urls_for($new);
     $this->current_navigation_items = $new;
