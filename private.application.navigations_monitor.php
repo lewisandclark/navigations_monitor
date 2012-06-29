@@ -36,7 +36,7 @@ class LiveWhaleApplicationNavigationsMonitor {
   }
 
   function is_being_tested () {
-    if ( !empty($this->test_ip) && $_SERVER['REMOTE_ADDR'] == $this->test_ip ) return TRUE;
+    //if ( !empty($this->test_ip) && $_SERVER['REMOTE_ADDR'] == $this->test_ip ) return TRUE;
     return FALSE; 
   }
 
@@ -202,7 +202,7 @@ class LiveWhaleApplicationNavigationsMonitor {
         if ( $item['only_has_position_changes']['depth'] != $item['depth'] ) $summary[] = "[the item is now nested " . (($item['only_has_position_changes']['depth'] < $item['depth']) ? "less deep" : "deeper") . "]";
       }
     } else if ( !empty($item['is_new_item']) ) {
-      $summary[] = "[this is most-likely a new item]";
+      $summary[] = "[this might be a new item]";
       if ( !$single_push_has_occurred ) $single_push_has_occurred = TRUE;
     } else if ( !empty($item['dropped']) ) {
       $summary[] = "[this item was premanently removed]";
@@ -273,7 +273,31 @@ class LiveWhaleApplicationNavigationsMonitor {
     global $_LW;
     if ( $this->is_editing_navigations() ) {
       $message = $this->message();
-      if ( $message && !empty($this->recipients) ) @mail(implode(', ', (array) $this->recipients), 'LiveWhale Navigation Update', $message, $this->headers());
+      
+      //add recipients by filter match -- substrings match to users current grouptitle
+      $recipients = array();
+      //load recipients
+      //$_SESSION['livewhale']['manage']['grouptitle'] -- holds the key to the kingdom
+      foreach($this->recipients as $recipient){
+        if(count($recipient['group_filters'])){ //multiple filters
+            foreach($recipient['group_filters'] as $filter){
+                if(strstr($_SESSION['livewhale']['manage']['grouptitle'], $filter)){
+                    if(!in_array($recipient['email']))
+                        $recipients[] = $recipient['email'];
+                }
+            }
+        }
+        else $recipients[] = $recipient['email']; //no filters add to recipients
+      }
+      //build sent to
+      $str = '';
+      foreach($recipients as $recip)
+      $str .= htmlspecialchars($recip).', ';
+      $str = rtrim($str,', ');
+      
+      $message = "This message has been sent to $str. <br /> If you do not wish to recieve these messages or you are recieving navigation alerts for the wrong groups let our team know.<br /><br />\n\n".$message;
+      
+      if ( $message && !empty($recipients) ) @mail(implode(', ', (array) $recipients), 'LiveWhale Navigation Update', $message, $this->headers());
       if ( is_resource($this->logfile) ) @fclose($this->logfile);
     }
   }

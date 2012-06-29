@@ -12,7 +12,7 @@ $config = array(
 
 /*  The email addresses of the people you want to receive the notifications. */ 
   'recipients' => array(
-    'First Last <account@school.edu>',
+    array('email'=>'Some Name <somename@example.com>','group_filters' => array('Group Name:'),//group_filters accept regex and substring matches for group names that will recieve the emails, otherwise all groups are selected
     ),
 
 /*  The email address of the sender (LiveWhale).
